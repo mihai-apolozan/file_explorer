@@ -11,3 +11,8 @@ export interface DirectoryListing {
     path: string;
     entries: FileEntry[];
 }
+
+export interface FileContent {
+    path: string;
+    content: string;
+}

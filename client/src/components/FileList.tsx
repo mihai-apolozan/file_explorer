@@ -6,9 +6,10 @@ interface Props {
     loading: boolean;
     error: string | null;
     onNavigate: (path: string) => void;
+    onFileClick: (path: string) => void;
 }
 
-export function FileList({entries, loading, error, onNavigate}: Props) {
+export function FileList({entries, loading, error, onNavigate, onFileClick}: Props) {
     if(loading) return <p>Loading...</p>;
     if(error) return <p style = {{color: 'red'}}>{error}</p>;
     if(entries.length === 0) return <p>Empty directory</p>;
@@ -34,6 +35,7 @@ export function FileList({entries, loading, error, onNavigate}: Props) {
                     key = {entry.path}
                     entry = {entry}
                     onNavigate={onNavigate}
+                    onFileClick={onFileClick}
                     />
                 })}
             </tbody>

@@ -7,9 +7,10 @@ interface Props {
     depth: number;
     currentPath: string;
     onNavigate: (path:string) => void;
+    onClose: () => void;
 }
 
-export function TreeNode( { entry, depth, currentPath, onNavigate }: Props) {
+export function TreeNode( { entry, depth, currentPath, onNavigate, onClose }: Props) {
     const isdir = entry.type === 'directory';
     const [open, setOpen] = useState(false);
     const [kids, setKids] = useState<FileEntry[]>([]);
@@ -38,6 +39,7 @@ export function TreeNode( { entry, depth, currentPath, onNavigate }: Props) {
     if(!isdir) return;
     return (
         <div style = {{paddingLeft: depth * 16 + 'px'}}onClick = { (e:React.MouseEvent) => {
+            onClose();
             onNavigate(entry.path);
             e.stopPropagation();
             if(!opened) {
@@ -50,7 +52,7 @@ export function TreeNode( { entry, depth, currentPath, onNavigate }: Props) {
                 setOpen(!open);
             }
         } }>
-            <div style = {highlight ? { backgroundColor: '#e6f2ff', fontWeight: 'bold' } : undefined}>
+            <div style = {highlight ? { backgroundColor: '#e6f2ff', fontWeight: 'bold' , cursor: 'pointer'} : {cursor: 'pointer'}}>
                 {isdir ? '📁' : '📄'} {entry.name}
             </div>
             {open && isdir && (<ul style = {{listStyle:'none', padding: 0, margin: 0}}>
@@ -63,7 +65,8 @@ export function TreeNode( { entry, depth, currentPath, onNavigate }: Props) {
                                     entry = {kid}
                                     depth = {depth + 1}
                                     currentPath = {currentPath}
-                                    onNavigate = {onNavigate}/>
+                                    onNavigate = {onNavigate}
+                                    onClose={onClose}/>
                                 </li>
                             );
                         })

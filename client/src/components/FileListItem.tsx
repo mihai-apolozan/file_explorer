@@ -3,6 +3,7 @@ import type { FileEntry } from "../types";
 interface Props {
     entry: FileEntry;
     onNavigate: (path: string) => void;
+    onFileClick: (path: string) => void;
 }
 
 function formatSize(bytes: number): string {
@@ -27,13 +28,13 @@ function formatDate(iso: string): string {
   return dateFormatter.format(new Date(iso));
 }
 
-export function FileListItem({ entry, onNavigate } : Props) {
+export function FileListItem({ entry, onNavigate, onFileClick } : Props) {
     const isdir = entry.type === 'directory';
 
     return (
         <tr
-        onClick = {() => isdir && onNavigate(entry.path)}
-        style = {{ cursor: isdir ? 'pointer' : 'default'}}
+        onClick = {() => isdir ? onNavigate(entry.path) : onFileClick(entry.path)}
+        style = {{ cursor: 'pointer'}}
         >
             <td>{isdir ? '📁' : '📄'} {entry.name}</td>
             <td>{formatSize(entry.size)}</td>

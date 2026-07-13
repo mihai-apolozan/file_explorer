@@ -6,9 +6,10 @@ import { useState, useEffect } from "react";
 interface Props {
     currentPath: string;
     onNavigate: (path:string) => void;
+    onClose: () => void;
 }
 
-export function FolderTree({ currentPath, onNavigate }: Props) {
+export function FolderTree({ currentPath, onNavigate, onClose }: Props) {
     const [entries, setEntries] = useState<FileEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -47,7 +48,8 @@ export function FolderTree({ currentPath, onNavigate }: Props) {
                         entry = {entry}
                         depth = {0}
                         currentPath = {currentPath}
-                        onNavigate = {onNavigate}/>
+                        onNavigate = {onNavigate}
+                        onClose={onClose}/>
                     </li>
                 )
             })}
