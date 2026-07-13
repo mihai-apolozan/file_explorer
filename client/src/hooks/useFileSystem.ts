@@ -3,10 +3,11 @@ import { listDirectory } from "../api/files";
 import type { FileEntry } from "../types";
 
 export function useFileSystem() {
-    const [currentPath, setCurrentPath] = useState('/');
     const [entries, setEntries] = useState<FileEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [history, setHistory] = useState<string[]>(['/']);
+    const currentPath = history[history.length -1 ];
 
     const fetchDirectory = useCallback(
         async (path: string) => {
@@ -25,19 +26,28 @@ export function useFileSystem() {
         },[]
     )
 
+    
+    const popHistory = () => {
+        if(history.length>1)
+            {setHistory(prev => prev.slice(0,-1));}
+    }
+
 
     useEffect(() => {
         fetchDirectory(currentPath);
     }, [currentPath, fetchDirectory]);
 
     const navigate = useCallback(
-        (path:string) => setCurrentPath(path), []
+        (path:string) => {setHistory(prev => [...prev, path]);}, []
     );
 
     const refresh = useCallback(
         () => fetchDirectory(currentPath),
         [currentPath, fetchDirectory]
     );
-    
-    return { currentPath, entries, loading, error, navigate, refresh };
+
+    const goBack = () => {
+        popHistory();
+    };
+    return { currentPath, entries, loading, error, navigate, refresh, goBack };
 }
