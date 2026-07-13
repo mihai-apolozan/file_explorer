@@ -1,0 +1,25 @@
+from pathlib import Path
+from fastapi import HTTPException
+from config import ROOT_DIR
+
+def resolve_safe_path(user_path:str) -> Path:
+    
+    cleaned = user_path.lstrip("/")
+
+    requested = (ROOT_DIR / cleaned).resolve()
+
+    if not requested.is_relative_to(ROOT_DIR):
+        raise HTTPException(status_code = 403, detail = "Access denied")
+
+    if not requested.exists():
+        raise HTTPException(status_code = 404, detail = "Does not exist")
+    
+    real = requested.resolve(strict= True)
+
+    if not real.is_relative_to(ROOT_DIR):
+        raise HTTPException(status_code = 403, detail = "Access denied")
+
+    return real
+
+def get_relative_path(abs_path: Path) -> str:
+    return "/" + abs_path.relative_to(ROOT_DIR).as_posix()
