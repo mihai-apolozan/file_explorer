@@ -5,14 +5,26 @@ import { Layout } from "./components/Layout";
 import { FolderTree } from "./components/FolderTree";
 import { useEffect, useState } from "react";
 import { FilePreview } from "./components/FilePreview";
+import type { FileEntry } from "./types";
+import { ContextMenu } from "./components/ContextMenu";
 
 export default function App() {
   const { currentPath, entries, loading, error, navigate, goBack } = useFileSystem();
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const closeFile = () => setSelectedFile(null);
+  const [contextMenu, setContextMenu] = useState<{ entry: FileEntry, x: number, y: number} | null>(null);
+
+  const contextHandler = (entry: FileEntry, x: number, y: number) => setContextMenu({entry, x, y});
+
 
   useEffect(() => { closeFile() }, [currentPath]);
 
+
+  useEffect(() => {
+    const close = () => setContextMenu(null);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [])
   return (
     <div>
       <div style = {{display:'flex'}}>
@@ -37,9 +49,11 @@ export default function App() {
           error = {error}
           onNavigate={navigate}
           onFileClick={(path:string) => setSelectedFile(path)}
+          onRightClick={contextHandler}
           />
         }
       </Layout>
+      { contextMenu && <ContextMenu entry = {contextMenu.entry} x = {contextMenu.x} y = {contextMenu.y}/> }
     </div>
   );
 }
