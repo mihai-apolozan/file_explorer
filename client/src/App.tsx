@@ -9,7 +9,7 @@ import type { FileEntry } from "./types";
 import { ContextMenu } from "./components/ContextMenu";
 
 export default function App() {
-  const { currentPath, entries, loading, error, navigate, goBack } = useFileSystem();
+  const { currentPath, entries, loading, error, navigate, refresh, goBack } = useFileSystem();
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const closeFile = () => setSelectedFile(null);
   const [contextMenu, setContextMenu] = useState<{ entry: FileEntry, x: number, y: number} | null>(null);
@@ -29,9 +29,9 @@ export default function App() {
     <div>
       <div style = {{display:'flex'}}>
         <button style = {{width:'50px'}}
-        onClick = {() => {navigate(currentPath.substring(0, currentPath.lastIndexOf('/')) || '/')}}/>
+        onClick = {() => {navigate(currentPath.substring(0, currentPath.lastIndexOf('/')) || '/')}}>Up</button>
         <button style = {{width:'50px'}}
-        onClick = {() => {goBack()}}/>
+        onClick = {() => {goBack()}}>back</button>
         
         <h1>File Explorer</h1>
       </div>
@@ -44,16 +44,18 @@ export default function App() {
           />
           :
           <FileList
+          currentPath={currentPath}
           entries = {entries}
           loading = {loading}
           error = {error}
           onNavigate={navigate}
           onFileClick={(path:string) => setSelectedFile(path)}
           onRightClick={contextHandler}
+          onRefresh={refresh}
           />
         }
       </Layout>
-      { contextMenu && <ContextMenu entry = {contextMenu.entry} x = {contextMenu.x} y = {contextMenu.y}/> }
+      { contextMenu && <ContextMenu entry = {contextMenu.entry} x = {contextMenu.x} y = {contextMenu.y} onRefresh={refresh}/> }
     </div>
   );
 }

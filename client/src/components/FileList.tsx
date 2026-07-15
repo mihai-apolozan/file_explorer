@@ -1,19 +1,23 @@
 import type { FileEntry } from "../types";
 import { FileListItem } from "./FileListItem";
+import { createEntry } from "../api/files";
+
 
 interface Props {
+    currentPath: string;
     entries: FileEntry[];
     loading: boolean;
     error: string | null;
     onNavigate: (path: string) => void;
     onFileClick: (path: string) => void;
     onRightClick: (entry: FileEntry, x: number, y: number) => void;
+    onRefresh: () => void;
 }
 
-export function FileList({entries, loading, error, onNavigate, onFileClick, onRightClick}: Props) {
+export function FileList({currentPath, entries, loading, error, onNavigate, onFileClick, onRightClick, onRefresh}: Props) {
     if(loading) return <p>Loading...</p>;
     if(error) return <p style = {{color: 'red'}}>{error}</p>;
-    if(entries.length === 0) return <p>Empty directory</p>;
+    //if(entries.length === 0) return <p>Empty directory</p>;
 
     const sorted = [...entries].sort((a,b) => {
         if(a.type !== b.type)
@@ -28,6 +32,14 @@ export function FileList({entries, loading, error, onNavigate, onFileClick, onRi
                     <th>Name</th>
                     <th>Size</th>
                     <th>Modified</th>
+                    <th><button onClick={async () => {
+                        const name = prompt(); if (name) {await createEntry(currentPath + '/' + name, 'directory'); onRefresh()};
+                        }
+                    }>📁➕</button></th>
+                    <th><button onClick={async () => {
+                        const name = prompt(); if (name) {await createEntry(currentPath + '/' + name, 'file'); onRefresh()};
+                        }
+                    }>📄➕</button></th>
                 </tr>
             </thead>
             <tbody>
