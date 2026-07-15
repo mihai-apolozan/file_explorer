@@ -44,3 +44,13 @@ export async function deleteEntry(
     });
     return response.data;
 }
+
+export async function searchServer(
+    q:string,
+    path:string
+): Promise<FileEntry[]> {
+    const response = await api.get<FileEntry[]>('/files/search', {
+        params: { q, path},
+    });
+    return response.data;
+}

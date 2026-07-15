@@ -49,5 +49,5 @@ export function useFileSystem() {
     const goBack = () => {
         popHistory();
     };
-    return { currentPath, entries, loading, error, navigate, refresh, goBack };
+    return { currentPath, entries, loading, error, navigate, refresh, goBack, setEntries };
 }

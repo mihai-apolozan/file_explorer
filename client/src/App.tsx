@@ -7,15 +7,17 @@ import { useEffect, useState } from "react";
 import { FilePreview } from "./components/FilePreview";
 import type { FileEntry } from "./types";
 import { ContextMenu } from "./components/ContextMenu";
+import { searchServer } from "./api/files";
 
 export default function App() {
-  const { currentPath, entries, loading, error, navigate, refresh, goBack } = useFileSystem();
+  const { currentPath, entries, loading, error, navigate, refresh, goBack, setEntries} = useFileSystem();
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const closeFile = () => setSelectedFile(null);
   const [contextMenu, setContextMenu] = useState<{ entry: FileEntry, x: number, y: number} | null>(null);
 
   const contextHandler = (entry: FileEntry, x: number, y: number) => setContextMenu({entry, x, y});
 
+  const [searchQuery, setSearch] = useState<string>('');
 
   useEffect(() => { closeFile() }, [currentPath]);
 
@@ -34,6 +36,12 @@ export default function App() {
         onClick = {() => {goBack()}}>back</button>
         
         <h1>File Explorer</h1>
+        <input
+        onChange = {(e) => setSearch(e.target.value)}
+        onKeyDown={async (e) => {if(e.key === 'Enter') {
+          const searchResults = await searchServer(searchQuery, '/');
+          setEntries(searchResults);
+        }}}></input>
       </div>
       <Breadcrumb path = {currentPath} onNavigate={navigate} />
       <Layout sidebar = {<FolderTree currentPath = {currentPath} onNavigate={navigate} onClose={closeFile}/>}>

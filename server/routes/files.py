@@ -130,3 +130,25 @@ async def delete(path:str):
     response = response + path
 
     return response
+
+@router.get("/files/search")
+async def search(q: str, path: str):
+    if not q:
+        raise HTTPException(
+            status_code= 400,
+            detail= 'Empty search'
+        )
+    
+    real_path = resolve_safe_path(path)
+
+    entryGenerator = real_path.rglob(f"*{q}*", case_sensitive= False)
+    findings = []
+    
+    for i in entryGenerator:
+        if len(findings) >= 50:
+            break
+        try:
+            findings.append(get_entry_info(i))
+        except:
+            continue
+    return findings
