@@ -5,6 +5,7 @@ interface Props {
     onNavigate: (path: string) => void;
     onFileClick: (path: string) => void;
     onRightClick: (entry: FileEntry, x: number, y: number) => void;
+    searchMode: boolean;
 }
 
 function formatSize(bytes: number): string {
@@ -29,7 +30,7 @@ function formatDate(iso: string): string {
   return dateFormatter.format(new Date(iso));
 }
 
-export function FileListItem({ entry, onNavigate, onFileClick, onRightClick } : Props) {
+export function FileListItem({ entry, onNavigate, onFileClick, onRightClick, searchMode } : Props) {
     const isdir = entry.type === 'directory';
 
     return (
@@ -38,7 +39,7 @@ export function FileListItem({ entry, onNavigate, onFileClick, onRightClick } : 
         onContextMenu={(e) => { e.preventDefault(); onRightClick(entry, e.clientX, e.clientY) }}
         style = {{ cursor: 'pointer'}}
         >
-            <td>{isdir ? '📁' : '📄'} {entry.name}</td>
+            <td>{isdir ? '📁' : '📄'} {searchMode ? entry.path : entry.name}</td>
             <td>{formatSize(entry.size)}</td>
             <td>{formatDate(entry.modified)}</td>
         </tr>

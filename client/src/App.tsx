@@ -8,18 +8,26 @@ import { FilePreview } from "./components/FilePreview";
 import type { FileEntry } from "./types";
 import { ContextMenu } from "./components/ContextMenu";
 import { searchServer } from "./api/files";
+import { useDebounce } from "./hooks/useDebounce";
 
 export default function App() {
-  const { currentPath, entries, loading, error, navigate, refresh, goBack, setEntries} = useFileSystem();
+  const { currentPath, entries, loading, error, navigate, refresh, goBack} = useFileSystem();
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const closeFile = () => setSelectedFile(null);
   const [contextMenu, setContextMenu] = useState<{ entry: FileEntry, x: number, y: number} | null>(null);
 
   const contextHandler = (entry: FileEntry, x: number, y: number) => setContextMenu({entry, x, y});
 
-  const [searchQuery, setSearch] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<FileEntry[] | null>(null);
+  const debouncedQuery = useDebounce(searchQuery, 300);
 
-  useEffect(() => { closeFile() }, [currentPath]);
+  useEffect(() => {
+    const asyncSearch = async () => {const results = await searchServer(debouncedQuery, '/'); setSearchResults(results);}
+    if(debouncedQuery.length > 1) asyncSearch();
+  }, [debouncedQuery])
+
+  useEffect(() => { closeFile(); setSearchResults(null); }, [currentPath]);
 
 
   useEffect(() => {
@@ -37,18 +45,32 @@ export default function App() {
         
         <h1>File Explorer</h1>
         <input
-        onChange = {(e) => setSearch(e.target.value)}
+        value = {searchQuery}
+        onChange = {(e) => setSearchQuery(e.target.value)}
         onKeyDown={async (e) => {if(e.key === 'Enter') {
-          const searchResults = await searchServer(searchQuery, '/');
-          setEntries(searchResults);
+          const results = await searchServer(searchQuery, '/');
+          setSearchResults(results);
         }}}></input>
+        <button onClick = {() => {setSearchQuery(''); setSearchResults(null);}}>Clear</button>
       </div>
-      <Breadcrumb path = {currentPath} onNavigate={navigate} />
+      <Breadcrumb path = {currentPath} onNavigate={navigate}/>
       <Layout sidebar = {<FolderTree currentPath = {currentPath} onNavigate={navigate} onClose={closeFile}/>}>
-        {selectedFile ? 
+        {selectedFile ?
           <FilePreview
           path = {selectedFile}
           onClose={closeFile}
+          />
+          : searchResults ?
+          <FileList
+          currentPath={currentPath}
+          entries={searchResults}
+          loading={false}
+          error={null}
+          onNavigate={navigate}
+          onFileClick={(path:string) => setSelectedFile(path)}
+          onRightClick={contextHandler}
+          onRefresh={refresh}
+          searchMode={true}
           />
           :
           <FileList
@@ -60,6 +82,7 @@ export default function App() {
           onFileClick={(path:string) => setSelectedFile(path)}
           onRightClick={contextHandler}
           onRefresh={refresh}
+          searchMode={false}
           />
         }
       </Layout>

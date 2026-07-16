@@ -12,9 +12,10 @@ interface Props {
     onFileClick: (path: string) => void;
     onRightClick: (entry: FileEntry, x: number, y: number) => void;
     onRefresh: () => void;
+    searchMode: boolean;
 }
 
-export function FileList({currentPath, entries, loading, error, onNavigate, onFileClick, onRightClick, onRefresh}: Props) {
+export function FileList({currentPath, entries, loading, error, onNavigate, onFileClick, onRightClick, onRefresh, searchMode}: Props) {
     if(loading) return <p>Loading...</p>;
     if(error) return <p style = {{color: 'red'}}>{error}</p>;
     //if(entries.length === 0) return <p>Empty directory</p>;
@@ -50,6 +51,7 @@ export function FileList({currentPath, entries, loading, error, onNavigate, onFi
                     onNavigate={onNavigate}
                     onFileClick={onFileClick}
                     onRightClick={onRightClick}
+                    searchMode={searchMode}
                     />
                 })}
             </tbody>
