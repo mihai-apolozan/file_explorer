@@ -9,6 +9,7 @@ import type { FileEntry } from "./types";
 import { ContextMenu } from "./components/ContextMenu";
 import { searchServer } from "./api/files";
 import { useDebounce } from "./hooks/useDebounce";
+import './App.css'
 
 export default function App() {
   const { currentPath, entries, loading, error, navigate, refresh, goBack} = useFileSystem();
@@ -24,7 +25,11 @@ export default function App() {
 
   useEffect(() => {
     const asyncSearch = async () => {const results = await searchServer(debouncedQuery, '/'); setSearchResults(results);}
-    if(debouncedQuery.length > 1) asyncSearch();
+    
+    if(debouncedQuery.length > 0) asyncSearch();
+    else {
+      setSearchResults(null);
+    }
   }, [debouncedQuery])
 
   useEffect(() => { closeFile(); setSearchResults(null); }, [currentPath]);
@@ -35,22 +40,19 @@ export default function App() {
     document.addEventListener('click', close);
     return () => document.removeEventListener('click', close);
   }, [])
+
+
   return (
     <div>
-      <div style = {{display:'flex'}}>
-        <button style = {{width:'50px'}}
-        onClick = {() => {navigate(currentPath.substring(0, currentPath.lastIndexOf('/')) || '/')}}>Up</button>
-        <button style = {{width:'50px'}}
-        onClick = {() => {goBack()}}>back</button>
+      <div className = 'toolbar'>
+        <button onClick = {() => {navigate(currentPath.substring(0, currentPath.lastIndexOf('/')) || '/')}}>Up</button>
+        <button onClick = {() => {goBack()}}>Back</button>
         
         <h1>File Explorer</h1>
         <input
         value = {searchQuery}
         onChange = {(e) => setSearchQuery(e.target.value)}
-        onKeyDown={async (e) => {if(e.key === 'Enter') {
-          const results = await searchServer(searchQuery, '/');
-          setSearchResults(results);
-        }}}></input>
+        ></input>
         <button onClick = {() => {setSearchQuery(''); setSearchResults(null);}}>Clear</button>
       </div>
       <Breadcrumb path = {currentPath} onNavigate={navigate}/>

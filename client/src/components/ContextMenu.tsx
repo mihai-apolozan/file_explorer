@@ -12,7 +12,7 @@ export function ContextMenu({ entry, x, y, onRefresh}: Props) {
 
     
     return (
-        <div style = {{position: 'fixed', top: y, left: x}}>
+        <div className="context-menu" style = {{position: 'fixed', top: y, left: x}}>
             <button onClick={async () => {const name = prompt(); if (name) {await renameEntry(entry.path, name); onRefresh();}}}>Rename</button>
             <button onClick={async () => {const yes = confirm(); if(yes) {await deleteEntry(entry.path); onRefresh();}}}>Delete</button>
         </div>

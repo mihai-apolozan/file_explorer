@@ -1,11 +1,19 @@
 .container {
     display: flex;
+    min-height: calc(100vh - 70px);
 }
 
-.left{
-    flex: 0.5;
+.left {
+    flex: 0 0 220px;
+    background-color: #063333;
+    color: #ccc;
+    padding: 12px;
+    overflow-y: auto;
 }
 
 .right {
-    flex: 2;
+    flex: 1;
+    background-color: #ffffff;
+    padding: 12px;
+    overflow-y: auto;
 }
