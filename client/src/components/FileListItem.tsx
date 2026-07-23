@@ -1,4 +1,6 @@
 import type { FileEntry } from "../types";
+import { File, Folder } from 'lucide-react'
+
 
 interface Props {
     entry: FileEntry;
@@ -37,9 +39,8 @@ export function FileListItem({ entry, onNavigate, onFileClick, onRightClick, sea
         <tr
         onClick = {() => isdir ? onNavigate(entry.path) : onFileClick(entry.path)}
         onContextMenu={(e) => { e.preventDefault(); onRightClick(entry, e.clientX, e.clientY) }}
-        style = {{ cursor: 'pointer'}}
         >
-            <td>{isdir ? '📁' : '📄'} {searchMode ? entry.path : entry.name}</td>
+            <td>{isdir ? <Folder size = {16}/> : <File size = {16}/>} {searchMode ? entry.path : entry.name}</td>
             <td>{formatSize(entry.size)}</td>
             <td>{formatDate(entry.modified)}</td>
         </tr>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { listDirectory } from "../api/files";
 import type { FileEntry } from "../types";
+import { ChevronDown, ChevronRight, File, Folder, FolderOpen } from 'lucide-react'
 
 interface Props {
     entry: FileEntry;
@@ -34,8 +35,8 @@ export function TreeNode( { entry, depth, currentPath, onNavigate, onClose }: Pr
         }
 
 
-    if(loading) return <p>Loading...</p>;
-    if(error) return <p style = {{color: 'red'}}>{error}</p>;
+    if(loading) return <div className="spinner-container"><div className="spinner"></div></div>;
+    if(error) return <div className="error-box">{error}</div>;
     if(!isdir) return;
     return (
         <div style = {{paddingLeft: depth * 16 + 'px'}}onClick = { (e:React.MouseEvent) => {
@@ -52,10 +53,12 @@ export function TreeNode( { entry, depth, currentPath, onNavigate, onClose }: Pr
                 setOpen(!open);
             }
         } }>
-            <div style = {highlight ? { backgroundColor: '#e6f2ff', fontWeight: 'bold' , cursor: 'pointer'} : {cursor: 'pointer'}}>
-                {isdir ? '📁' : '📄'} {entry.name}
+            <div className={`tree-node ${highlight ? 'tree-node-active' : ''}`}>
+                {open ? <ChevronDown size={16}/> : <ChevronRight size={16}/>}
+                {isdir ? (open ? <FolderOpen size = {16}/> : <Folder size = {16}/>) : <File size = {16}/>}
+                {entry.name}
             </div>
-            {open && isdir && (<ul style = {{listStyle:'none', padding: 0, margin: 0}}>
+            {open && isdir && (<ul className="tree-list">
                 {
                     kids.map((kid) => {
                             if (kid.type === 'file') return;

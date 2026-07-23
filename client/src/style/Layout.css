@@ -5,15 +5,15 @@
 
 .left {
     flex: 0 0 220px;
-    background-color: #063333;
-    color: #ccc;
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
     padding: 12px;
     overflow-y: auto;
 }
 
 .right {
     flex: 1;
-    background-color: #ffffff;
+    background-color: var(--content-bg);
     padding: 12px;
     overflow-y: auto;
 }

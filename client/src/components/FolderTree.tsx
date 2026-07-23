@@ -7,9 +7,10 @@ interface Props {
     currentPath: string;
     onNavigate: (path:string) => void;
     onClose: () => void;
+    token: number;
 }
 
-export function FolderTree({ currentPath, onNavigate, onClose }: Props) {
+export function FolderTree({ currentPath, onNavigate, onClose, token }: Props) {
     const [entries, setEntries] = useState<FileEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -33,12 +34,12 @@ export function FolderTree({ currentPath, onNavigate, onClose }: Props) {
         () => {
             fetchRoot();
             }
-    ,[]);
+    ,[token]);
 
-    if(loading) return <p>Loading...</p>;
-    if(error) return <p style = {{color: 'red'}}>{error}</p>;
+    if(loading) return <div className="spinner-container"><div className="spinner"></div></div>;
+    if(error) return <div className="error-box">{error}<button onClick={fetchRoot}>Try again</button></div>;
     return (
-        <ul style = {{listStyle: 'none', border: '0px', padding:'0px'}}>
+        <ul className="tree-list">
             {entries.map((entry) => {
                 if(entry.type === 'file') return;
                 return (

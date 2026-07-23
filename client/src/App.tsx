@@ -10,6 +10,7 @@ import { ContextMenu } from "./components/ContextMenu";
 import { searchServer } from "./api/files";
 import { useDebounce } from "./hooks/useDebounce";
 import './App.css'
+import { ArrowLeft, ArrowUp, X } from "lucide-react";
 
 export default function App() {
   const { currentPath, entries, loading, error, navigate, refresh, goBack} = useFileSystem();
@@ -22,15 +23,17 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<FileEntry[] | null>(null);
   const debouncedQuery = useDebounce(searchQuery, 300);
+  const noResults = searchResults?.length === 0;
+  const [refreshToken, setRefreshToken] = useState(0);
 
   useEffect(() => {
-    const asyncSearch = async () => {const results = await searchServer(debouncedQuery, '/'); setSearchResults(results);}
+    const asyncSearch = async () => {const results = await searchServer(debouncedQuery, currentPath); setSearchResults(results);}
     
     if(debouncedQuery.length > 0) asyncSearch();
     else {
       setSearchResults(null);
     }
-  }, [debouncedQuery])
+  }, [debouncedQuery, currentPath])
 
   useEffect(() => { closeFile(); setSearchResults(null); }, [currentPath]);
 
@@ -45,24 +48,30 @@ export default function App() {
   return (
     <div>
       <div className = 'toolbar'>
-        <button onClick = {() => {navigate(currentPath.substring(0, currentPath.lastIndexOf('/')) || '/')}}>Up</button>
-        <button onClick = {() => {goBack()}}>Back</button>
+        <button onClick = {() => {goBack()}}><ArrowLeft/></button>
+        <button onClick = {() => {navigate(currentPath.substring(0, currentPath.lastIndexOf('/')) || '/')}}><ArrowUp/></button>
+        
         
         <h1>File Explorer</h1>
         <input
         value = {searchQuery}
         onChange = {(e) => setSearchQuery(e.target.value)}
+        onKeyDown = {(e) => { if (e.key === 'Enter' && searchQuery.length > 0) searchServer(searchQuery, currentPath).then(setSearchResults); }}
         ></input>
-        <button onClick = {() => {setSearchQuery(''); setSearchResults(null);}}>Clear</button>
+        <button onClick = {() => {setSearchQuery(''); setSearchResults(null);}}><X/></button>
       </div>
       <Breadcrumb path = {currentPath} onNavigate={navigate}/>
-      <Layout sidebar = {<FolderTree currentPath = {currentPath} onNavigate={navigate} onClose={closeFile}/>}>
+      <Layout sidebar = 
+        {<FolderTree currentPath = {currentPath} onNavigate={navigate} onClose={closeFile} token = {refreshToken}/>}>
         {selectedFile ?
           <FilePreview
           path = {selectedFile}
           onClose={closeFile}
           />
-          : searchResults ?
+            : searchResults ?
+          (noResults ?
+          <div className="empty-state">No files match your search</div>
+            :
           <FileList
           currentPath={currentPath}
           entries={searchResults}
@@ -71,9 +80,9 @@ export default function App() {
           onNavigate={navigate}
           onFileClick={(path:string) => setSelectedFile(path)}
           onRightClick={contextHandler}
-          onRefresh={refresh}
+          onRefresh={() => {refresh(); setRefreshToken(prev => prev + 1)}}
           searchMode={true}
-          />
+          />)
           :
           <FileList
           currentPath={currentPath}
@@ -83,12 +92,12 @@ export default function App() {
           onNavigate={navigate}
           onFileClick={(path:string) => setSelectedFile(path)}
           onRightClick={contextHandler}
-          onRefresh={refresh}
+          onRefresh={() => {refresh(); setRefreshToken(prev => prev + 1)}}
           searchMode={false}
           />
         }
       </Layout>
-      { contextMenu && <ContextMenu entry = {contextMenu.entry} x = {contextMenu.x} y = {contextMenu.y} onRefresh={refresh}/> }
+      { contextMenu && <ContextMenu entry = {contextMenu.entry} x = {contextMenu.x} y = {contextMenu.y} onRefresh={() => {refresh(); setRefreshToken(prev => prev + 1)}}/> }
     </div>
   );
 }

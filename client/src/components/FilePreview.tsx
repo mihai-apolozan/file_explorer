@@ -30,11 +30,11 @@ export function FilePreview({ path, onClose }: Props) {
     },[path])
 
 
-    if(loading) return (<div>Loading</div>);
-    if(error) return (<div>{ error }</div>)
+    if(loading) return <div className="spinner-container"><div className="spinner"></div></div>;
+    if(error) return <div className="error-box">{error}</div>;
     return (
         <div >
-            <button onClick={onClose} style={{padding: '8px 16px', fontSize: '16px', cursor: 'pointer', marginBottom: '12px'}}>Close</button>
+            <button onClick={onClose} className="preview-close">Close</button>
             <pre>{content}</pre>
         </div>
     );

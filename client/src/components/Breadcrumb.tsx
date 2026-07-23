@@ -10,7 +10,7 @@ export function Breadcrumb({path, onNavigate}: Props) {
         <nav>
             <span
                 onClick = {() => onNavigate('/')}
-                style = {{cursor: 'pointer'}}
+                className="breadcrumb-home"
             >
                 Home
             </span>
@@ -29,7 +29,7 @@ export function Breadcrumb({path, onNavigate}: Props) {
                                 ) : (
                                     <span
                                     onClick = {() => onNavigate(segmentPath)}
-                                    style = {{cursor: 'pointer', textDecoration: 'underline'}}>
+                                    className="breadcrumb-link">
                                         {segment}
                                     </span>
                                 )
