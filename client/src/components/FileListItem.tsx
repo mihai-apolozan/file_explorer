@@ -5,7 +5,7 @@ import { File, Folder } from 'lucide-react'
 interface Props {
     entry: FileEntry;
     onNavigate: (path: string) => void;
-    onFileClick: (path: string) => void;
+    onFileClick: (entry: FileEntry) => void;
     onRightClick: (entry: FileEntry, x: number, y: number) => void;
     searchMode: boolean;
 }
@@ -37,7 +37,7 @@ export function FileListItem({ entry, onNavigate, onFileClick, onRightClick, sea
 
     return (
         <tr
-        onClick = {() => isdir ? onNavigate(entry.path) : onFileClick(entry.path)}
+        onClick = {() => isdir ? onNavigate(entry.path) : onFileClick(entry)}
         onContextMenu={(e) => { e.preventDefault(); onRightClick(entry, e.clientX, e.clientY) }}
         >
             <td>{isdir ? <Folder size = {16}/> : <File size = {16}/>} {searchMode ? entry.path : entry.name}</td>

@@ -14,7 +14,7 @@ import { ArrowLeft, ArrowUp, X } from "lucide-react";
 
 export default function App() {
   const { currentPath, entries, loading, error, navigate, refresh, goBack} = useFileSystem();
-  const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<FileEntry | null>(null);
   const closeFile = () => setSelectedFile(null);
   const [contextMenu, setContextMenu] = useState<{ entry: FileEntry, x: number, y: number} | null>(null);
 
@@ -65,7 +65,7 @@ export default function App() {
         {<FolderTree currentPath = {currentPath} onNavigate={navigate} onClose={closeFile} token = {refreshToken}/>}>
         {selectedFile ?
           <FilePreview
-          path = {selectedFile}
+          entry = {selectedFile}
           onClose={closeFile}
           />
             : searchResults ?
@@ -78,7 +78,7 @@ export default function App() {
           loading={false}
           error={null}
           onNavigate={navigate}
-          onFileClick={(path:string) => setSelectedFile(path)}
+          onFileClick={(entry: FileEntry) => setSelectedFile(entry)}
           onRightClick={contextHandler}
           onRefresh={() => {refresh(); setRefreshToken(prev => prev + 1)}}
           searchMode={true}
@@ -90,7 +90,7 @@ export default function App() {
           loading = {loading}
           error = {error}
           onNavigate={navigate}
-          onFileClick={(path:string) => setSelectedFile(path)}
+          onFileClick={(entry: FileEntry) => setSelectedFile(entry)}
           onRightClick={contextHandler}
           onRefresh={() => {refresh(); setRefreshToken(prev => prev + 1)}}
           searchMode={false}

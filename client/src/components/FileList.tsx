@@ -10,7 +10,7 @@ interface Props {
     loading: boolean;
     error: string | null;
     onNavigate: (path: string) => void;
-    onFileClick: (path: string) => void;
+    onFileClick: (entry: FileEntry) => void;
     onRightClick: (entry: FileEntry, x: number, y: number) => void;
     onRefresh: () => void;
     searchMode: boolean;

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from middleware.path_guard import resolve_safe_path, get_relative_path, resolve_safe_parent
 from utils.fs_helpers import list_directory, get_entry_info
 from middleware.models import CreateRequest, RenameRequest
-
+from fastapi.responses import FileResponse
 router = APIRouter()
 
 @router.get("/files")
@@ -152,3 +152,36 @@ async def search(q: str, path: str):
         except:
             continue
     return findings
+
+@router.get("/files/raw")
+async def read_raw_file(path:str):
+    resolved = resolve_safe_path(path)
+    if resolved.is_dir():
+        raise HTTPException(
+            status_code = 400,
+            detail = "Path is not a file"
+        )
+    
+    info = get_entry_info(resolved)
+    
+    if info["mimeType"] is None:
+        raise HTTPException(
+            status_code= 400,
+            detail = "Asked file mime type is none"
+        )
+
+    
+    if info['size'] > 1000000:
+        raise HTTPException(
+            status_code = 400,
+            detail = "The file size is too big"
+        )
+    
+    try:
+        return FileResponse(path = resolved, media_type = info["mimeType"])
+    except:
+        raise HTTPException(
+            status_code= 500,
+            detail = "Could not read file, try again"
+        )
+    
