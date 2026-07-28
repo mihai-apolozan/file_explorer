@@ -8,9 +8,12 @@ import { FilePreview } from "./components/FilePreview";
 import type { FileEntry } from "./types";
 import { ContextMenu } from "./components/ContextMenu";
 import { searchServer } from "./api/files";
+import { indexDirectory, semanticSearch } from "./api/rag";
+import type { SemanticResult } from "./api/rag";
+import { SemanticResults } from "./components/SemanticResults";
 import { useDebounce } from "./hooks/useDebounce";
 import './App.css'
-import { ArrowLeft, ArrowUp, X } from "lucide-react";
+import { ArrowLeft, ArrowUp, X, DatabaseZap, Brain } from "lucide-react";
 
 export default function App() {
   const { currentPath, entries, loading, error, navigate, refresh, goBack} = useFileSystem();
@@ -25,17 +28,22 @@ export default function App() {
   const debouncedQuery = useDebounce(searchQuery, 300);
   const noResults = searchResults?.length === 0;
   const [refreshToken, setRefreshToken] = useState(0);
+  const [semanticMode, setSemanticMode] = useState(false);
+  const [semanticResults, setSemanticResults] = useState<SemanticResult[] | null>(null);
+  const [indexing, setIndexing] = useState(false);
+  const [indexMessage, setIndexMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    if (semanticMode) return;
     const asyncSearch = async () => {const results = await searchServer(debouncedQuery, currentPath); setSearchResults(results);}
-    
+
     if(debouncedQuery.length > 0) asyncSearch();
     else {
       setSearchResults(null);
     }
-  }, [debouncedQuery, currentPath])
+  }, [debouncedQuery, currentPath, semanticMode])
 
-  useEffect(() => { closeFile(); setSearchResults(null); }, [currentPath]);
+  useEffect(() => { closeFile(); setSearchResults(null); setSemanticResults(null); setIndexMessage(null); }, [currentPath]);
 
 
   useEffect(() => {
@@ -53,12 +61,37 @@ export default function App() {
         
         
         <h1>File Explorer</h1>
+        <button
+        onClick={() => {
+          setIndexing(true); setIndexMessage(null);
+          indexDirectory(currentPath)
+            .then(res => setIndexMessage(`Indexed ${res.files} files, ${res.chunks} chunks`))
+            .catch(() => setIndexMessage('Indexing failed'))
+            .finally(() => setIndexing(false));
+        }}
+        disabled={indexing}
+        ><DatabaseZap/> {indexing ? 'Indexing...' : 'Index'}</button>
+        {indexMessage && <span className="index-message">{indexMessage}</span>}
+        <button
+        onClick={() => { setSemanticMode(!semanticMode); setSearchQuery(''); setSearchResults(null); setSemanticResults(null); }}
+        className={semanticMode ? 'toolbar-toggle-active' : ''}
+        title={semanticMode ? 'Switch to filename search' : 'Switch to semantic search'}
+        ><Brain/></button>
         <input
         value = {searchQuery}
+        placeholder={semanticMode ? 'Semantic search...' : 'Search files...'}
         onChange = {(e) => setSearchQuery(e.target.value)}
-        onKeyDown = {(e) => { if (e.key === 'Enter' && searchQuery.length > 0) searchServer(searchQuery, currentPath).then(setSearchResults); }}
+        onKeyDown = {(e) => {
+          if (e.key === 'Enter' && searchQuery.length > 0) {
+            if (semanticMode) {
+              semanticSearch(searchQuery).then(setSemanticResults);
+            } else {
+              searchServer(searchQuery, currentPath).then(setSearchResults);
+            }
+          }
+        }}
         ></input>
-        <button onClick = {() => {setSearchQuery(''); setSearchResults(null);}}><X/></button>
+        <button onClick = {() => {setSearchQuery(''); setSearchResults(null); setSemanticResults(null);}}><X/></button>
       </div>
       <Breadcrumb path = {currentPath} onNavigate={navigate}/>
       <Layout sidebar = 
@@ -68,6 +101,8 @@ export default function App() {
           entry = {selectedFile}
           onClose={closeFile}
           />
+            : semanticResults ?
+          <SemanticResults results={semanticResults} onFileClick={(entry) => setSelectedFile(entry)} />
             : searchResults ?
           (noResults ?
           <div className="empty-state">No files match your search</div>

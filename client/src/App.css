@@ -267,6 +267,17 @@ tbody td {
   background: #fde8e8;
 }
 
+/* --- No preview fallback --- */
+
+.no-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: var(--table-header-text);
+  font-size: 15px;
+}
+
 .empty td{
   text-align: center;
   cursor: text;
@@ -275,4 +286,65 @@ tbody td {
 
 .empty:hover{
   background: none;
+}
+
+/* --- Index button / Semantic toggle --- */
+
+.index-message {
+  font-size: 12px;
+  color: var(--toolbar-text);
+}
+
+.toolbar-toggle-active {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border-color: var(--accent) !important;
+}
+
+/* --- Semantic results --- */
+
+.semantic-results {
+  padding: 8px 12px;
+}
+
+.semantic-result {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--table-cell-border);
+  cursor: pointer;
+}
+
+.semantic-result:hover {
+  background: var(--table-row-hover);
+}
+
+.semantic-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.semantic-result-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.semantic-result-score {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.semantic-result-path {
+  font-size: 12px;
+  color: var(--table-header-text);
+  margin-top: 2px;
+}
+
+.semantic-result-snippet {
+  font-size: 13px;
+  margin-top: 6px;
+  color: var(--body-text);
+  white-space: pre-wrap;
+  max-height: 60px;
+  overflow: hidden;
 }

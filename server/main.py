@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config import ROOT_DIR
 from routes.files import router as files_router
+from routes.rag import router as rag_router
 
 app = FastAPI()
 
@@ -13,6 +14,7 @@ app.add_middleware(
 )
 
 app.include_router(files_router, prefix = "/api")
+app.include_router(rag_router, prefix = '/api')
 
 @app.get("/api/health")
 async def health_check():
