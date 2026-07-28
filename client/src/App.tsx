@@ -32,12 +32,21 @@ export default function App() {
   const [semanticResults, setSemanticResults] = useState<SemanticResult[] | null>(null);
   const [indexing, setIndexing] = useState(false);
   const [indexMessage, setIndexMessage] = useState<string | null>(null);
+  const [searchError, setSearchError] = useState('');
+  const [searchLoading, setSearchLoading] = useState(false);
+
 
   useEffect(() => {
     if (semanticMode) return;
     const asyncSearch = async () => {const results = await searchServer(debouncedQuery, currentPath); setSearchResults(results);}
 
-    if(debouncedQuery.length > 0) asyncSearch();
+    if(debouncedQuery.length > 0) {
+      setSearchError('');
+      setSearchLoading(true);
+      asyncSearch()
+      .catch((error) => setSearchError(error.message))
+      .finally(() => setSearchLoading(false));
+    }
     else {
       setSearchResults(null);
     }
@@ -83,10 +92,18 @@ export default function App() {
         onChange = {(e) => setSearchQuery(e.target.value)}
         onKeyDown = {(e) => {
           if (e.key === 'Enter' && searchQuery.length > 0) {
+            setSearchError('');
+            setSearchLoading(true);
             if (semanticMode) {
-              semanticSearch(searchQuery).then(setSemanticResults);
+              semanticSearch(searchQuery)
+              .then(setSemanticResults)
+              .catch((error) => setSearchError(error.message))
+              .finally(() => setSearchLoading(false));
             } else {
-              searchServer(searchQuery, currentPath).then(setSearchResults);
+              searchServer(searchQuery, currentPath)
+              .then(setSearchResults)
+              .catch((error) => setSearchError(error.message))
+              .finally(() => setSearchLoading(false));
             }
           }
         }}
@@ -102,7 +119,12 @@ export default function App() {
           onClose={closeFile}
           />
             : semanticResults ?
-          <SemanticResults results={semanticResults} onFileClick={(entry) => setSelectedFile(entry)} />
+          <SemanticResults
+          results={semanticResults}
+          onFileClick={(entry) => setSelectedFile(entry)}
+          loading = {searchLoading}
+          error = {searchError}
+          />
             : searchResults ?
           (noResults ?
           <div className="empty-state">No files match your search</div>
@@ -110,8 +132,8 @@ export default function App() {
           <FileList
           currentPath={currentPath}
           entries={searchResults}
-          loading={false}
-          error={null}
+          loading={searchLoading}
+          error={searchError}
           onNavigate={navigate}
           onFileClick={(entry: FileEntry) => setSelectedFile(entry)}
           onRightClick={contextHandler}

@@ -4,9 +4,13 @@ import type { FileEntry } from '../types';
 interface Props {
     results: SemanticResult[];
     onFileClick: (entry: FileEntry) => void;
+    loading: boolean;
+    error: string;
 }
 
-export function SemanticResults({ results, onFileClick }: Props) {
+export function SemanticResults({ results, onFileClick, loading, error }: Props) {
+    if(loading) return <div className="spinner-container"><div className="spinner"></div></div>;
+    if(error) return <div className="error-box">{error}</div>;
     if (results.length === 0) {
         return <div className="empty-state">No semantic matches found</div>;
     }
