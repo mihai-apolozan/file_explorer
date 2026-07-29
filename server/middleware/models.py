@@ -7,3 +7,7 @@ class CreateRequest(BaseModel):
 class RenameRequest(BaseModel):
     path: str
     newName: str
+
+class WriteRequest(BaseModel):
+    path: str
+    content: str

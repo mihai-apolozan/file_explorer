@@ -17,3 +17,7 @@ export interface FileContent {
     content: string;
 }
 
+export interface WriteResponse {
+    path: string;
+    size: number;
+}

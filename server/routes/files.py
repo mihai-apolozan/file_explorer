@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from middleware.path_guard import resolve_safe_path, get_relative_path, resolve_safe_parent
 from utils.fs_helpers import list_directory, get_entry_info
-from middleware.models import CreateRequest, RenameRequest
+from middleware.models import CreateRequest, RenameRequest, WriteRequest
 from fastapi.responses import FileResponse
 router = APIRouter()
 
@@ -184,4 +184,49 @@ async def read_raw_file(path:str):
             status_code= 500,
             detail = "Could not read file, try again"
         )
+
+
+
+
+@router.put("/files/write")
+async def write_file(body: WriteRequest):
+    resolved = resolve_safe_path(body.path)
+    if resolved.is_dir():
+        raise HTTPException(
+            status_code = 400,
+            detail = "Path is not a file"
+        )
     
+    info = get_entry_info(resolved)
+    
+    if info["mimeType"] is None:
+        raise HTTPException(
+            status_code= 400,
+            detail = "Path is not a text file"
+        )
+
+    if 'text/' not in info['mimeType']:
+        raise HTTPException(
+            status_code = 400,
+            detail = "File is not a text file"
+        )
+
+    if len(body.content) > 1000000:
+        raise HTTPException(
+                    status_code = 400,
+                    detail = "The file size is too big"
+                )
+    
+    
+    try:
+        resolved.write_text(body.content)
+        
+    except:
+        raise HTTPException(
+            status_code= 500,
+            detail = "Could not write file, try again"
+        )
+    return {
+        "path": get_relative_path(resolved),
+        "size": resolved.stat().st_size,
+    }

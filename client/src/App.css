@@ -202,6 +202,34 @@ tbody td {
   margin-bottom: 12px;
 }
 
+.preview-edit {
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-left: 8px;
+  margin-bottom: 12px;
+  border: 1px solid var(--table-border);
+  border-radius: 4px;
+  background: var(--toolbar-bg);
+  color: var(--toolbar-text);
+}
+
+.save-feedback {
+  margin-left: 10px;
+  font-size: 13px;
+  color: var(--toolbar-text);
+}
+
+.dirty-indicator {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #c9864d;
+  background: rgba(201, 134, 77, 0.1);
+  border-radius: 4px;
+}
+
 /* --- Empty state --- */
 
 .empty-state {
@@ -268,6 +296,19 @@ tbody td {
 }
 
 /* --- No preview fallback --- */
+
+.editor-textarea {
+  width: 100%;
+  min-height: 400px;
+  padding: 12px;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  border: 1px solid var(--table-border);
+  border-radius: 4px;
+  resize: vertical;
+  tab-size: 4;
+}
 
 .no-preview {
   display: flex;

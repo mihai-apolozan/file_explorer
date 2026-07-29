@@ -1,5 +1,5 @@
 import { api } from './client';
-import type { DirectoryListing, FileContent, FileEntry } from '../types';
+import type { DirectoryListing, FileContent, FileEntry, WriteResponse } from '../types';
 
 
 export async function listDirectory(
@@ -53,5 +53,13 @@ export async function searchServer(
     const response = await api.get<FileEntry[]>('/files/search', {
         params: { q, path},
     });
+    return response.data;
+}
+
+export async function writeFile(
+    path: string,
+    content: string,
+): Promise<WriteResponse> {
+    const response = await api.put<WriteResponse>('/files/write', {path, content});
     return response.data;
 }
