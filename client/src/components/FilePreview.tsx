@@ -77,7 +77,7 @@ export function FilePreview({ entry, onClose }: Props) {
     if(isImage) return (
         <div >
             <button onClick={onClose} className="preview-close">Close</button>
-            <img src = {`http://localhost:8000/api/files/raw?path=${entry.path}`} style={{maxWidth: '100%'}}/>
+            <img src = {`/api/files/raw?path=${encodeURIComponent(entry.path)}`} style={{maxWidth: '100%'}}/>
         </div>
     )
 
