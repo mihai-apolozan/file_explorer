@@ -141,12 +141,15 @@ async def search(q: str, path: str):
     
     real_path = resolve_safe_path(path)
 
-    entryGenerator = real_path.rglob(f"*{q}*", case_sensitive= False)
+    needle = q.lower()
+    entryGenerator = real_path.rglob("*")
     findings = []
-    
+
     for i in entryGenerator:
         if len(findings) >= 50:
             break
+        if needle not in i.name.lower():
+            continue
         try:
             findings.append(get_entry_info(i))
         except:
