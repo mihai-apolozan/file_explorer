@@ -6,6 +6,9 @@ from rag.chunker import chunker
 router = APIRouter()
 from utils.fs_helpers import get_entry_info
 
+SKIP_DIRS = {'node_modules', '__pycache__', 'venv'}
+MAX_BATCH = 5000
+
 @router.post("/rag/index")
 async def index(path:str = '/'):
     real = resolve_safe_path(path)
@@ -17,20 +20,24 @@ async def index(path:str = '/'):
         if path_item.is_dir():
             continue
 
-
+        parents = path_item.relative_to(real).parts[:-1]
+        if any(part in SKIP_DIRS or part.startswith('.') for part in parents):
+            continue
 
         data = chunker(path_item)
         if not data:
             continue
         number_of_chunks += len(data)
         number_of_files += 1
-        collection.upsert(
-            documents = [item['text'] for item in data],
-            ids = [f"{item['file_path']}::chunk_{item['chunk_index']}" for item in data],
-            metadatas = [{'file_path': item['file_path'], 'chunk_index': item['chunk_index']} for item in data]
-            )
-    
-        
+        for start in range(0, len(data), MAX_BATCH):
+            batch = data[start:start + MAX_BATCH]
+            collection.upsert(
+                documents = [item['text'] for item in batch],
+                ids = [f"{item['file_path']}::chunk_{item['chunk_index']}" for item in batch],
+                metadatas = [{'file_path': item['file_path'], 'chunk_index': item['chunk_index']} for item in batch]
+                )
+
+
     return {'files': number_of_files, 'chunks': number_of_chunks}
 
 @router.get('/rag/search')

@@ -26,7 +26,7 @@ export function SemanticResults({ results, onFileClick, loading, error }: Props)
                     <div className="semantic-result-header">
                         <span className="semantic-result-name">{result.entry.name}</span>
                         <span className="semantic-result-score">
-                            {(1 - result.distances / 2).toFixed(0)}% match
+                            {((1 - result.distances / 2) * 100).toFixed(0)}% match
                         </span>
                     </div>
                     <div className="semantic-result-path">{result.entry.path}</div>

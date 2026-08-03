@@ -1,35 +1,51 @@
 from pathlib import Path
 import mimetypes
 
+CHUNK_SIZE = 800
+OVERLAP = 100
+
 def chunker(path: Path) -> list:
-    i = 0
+    type, encoding = mimetypes.guess_type(path.name)
+    if not type or not type.startswith('text/') or encoding:
+        return []
+
+    try:
+        text = path.read_text()
+    except (UnicodeDecodeError, OSError):
+        return []
+
+    # Split on blank lines, then hard-split any paragraph too big to fit a chunk.
+    pieces = []
+    for paragraph in text.split('\n\n'):
+        paragraph = paragraph.strip()
+        if not paragraph:
+            continue
+        while len(paragraph) > CHUNK_SIZE:
+            pieces.append(paragraph[:CHUNK_SIZE])
+            paragraph = paragraph[CHUNK_SIZE - OVERLAP:]
+        pieces.append(paragraph)
+
+    # Group pieces up to CHUNK_SIZE, carrying the tail of each chunk into the next.
     chunks = []
-    type = mimetypes.guess_type(path.name)[0]
-    if not type or not type.startswith('text/'):
-        return chunks
-
-    text = path.read_text()
-
-    paragraphs = text.split('\n\n')
-
-    for paragraph in paragraphs:
-        new_lines = paragraph.split('\n')
-        for new_line in new_lines:
-            while len(new_line) > 500:
-                chunks.append(new_line[:500])
-                new_line = new_line[500:]
-            chunks.append(new_line)
+    current = ''
+    for piece in pieces:
+        if not current:
+            current = piece
+        elif len(current) + len(piece) + 2 > CHUNK_SIZE:
+            chunks.append(current)
+            current = current[-OVERLAP:] + '\n\n' + piece
+        else:
+            current = current + '\n\n' + piece
+    if current:
+        chunks.append(current)
 
     dict_list = []
 
-    for chunk in chunks:
-        if not chunk:
-            continue
+    for i, chunk in enumerate(chunks):
         dict_list.append({
             "text": chunk,
             "file_path": str(path),
             "chunk_index": i,
         })
-        i = i+1
 
     return dict_list
