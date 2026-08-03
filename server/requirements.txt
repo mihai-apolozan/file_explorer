@@ -2,6 +2,7 @@ aiofiles==25.1.0
 annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.14.1
+chromadb>=1.0.0,<2.0.0
 click==8.4.2
 fastapi==0.139.0
 h11==0.16.0
