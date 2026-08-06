@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from config import ROOT_DIR
 from routes.files import router as files_router
 from routes.rag import router as rag_router
+from pathlib import Path
+
 
 app = FastAPI()
 
@@ -12,6 +14,12 @@ app.add_middleware(
 	allow_methods = ["*"],
 	allow_headers = ["*"],
 )
+
+
+DIST = Path(__file__).resolve().parent.parent / 'client' / 'dist'
+
+app.frontend('/', directory= DIST, check_dir= False, fallback= None)
+
 
 app.include_router(files_router, prefix = "/api")
 app.include_router(rag_router, prefix = '/api')
