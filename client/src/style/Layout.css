@@ -17,3 +17,18 @@
     padding: 12px;
     overflow-y: auto;
 }
+
+@media (max-width: 700px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .left {
+        flex: 0 0 auto;
+        max-height: 35vh;
+    }
+
+    .right {
+        overflow-x: auto;
+    }
+}

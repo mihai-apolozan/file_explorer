@@ -50,19 +50,23 @@ export function FilePreview({ entry, onClose }: Props) {
         return '';
     }, [content, isText]);
 
+    const handleSave = () => {
+        setFeedback('saving');
+        writeFile(entry.path, content)
+        .then(() => {
+            setFeedback('saved');
+            setTimeout(() => setFeedback('idle'), 2000);
+            setSavedContent(content);
+        })
+        .catch(() => setFeedback('error'));
+    }
+
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if((e.ctrlKey || e.metaKey) && e.key === 's') {
                 e.preventDefault();
-                setFeedback('saving');
-                writeFile(entry.path, content)
-                .then(() => {
-                    setFeedback('saved');
-                    setTimeout(() => setFeedback('idle'), 2000);
-                    setSavedContent(content);
-                })
-                .catch(() => setFeedback('error'));
-            }    
+                handleSave();
+            }
         }
         addEventListener('keydown', handleKeyDown);
         return () => {
@@ -88,6 +92,7 @@ export function FilePreview({ entry, onClose }: Props) {
                 <button onClick={() => {if(!isDirty || window.confirm('Unsaved changes! Proceed?')) onClose();}}
                 className="preview-close">Close</button>
                 <button onClick={() => setEditing(!editing)} className="preview-edit">{editing ? 'Preview' : 'Edit'}</button>
+                {editing && <button onClick={handleSave} disabled={!isDirty || feedback === 'saving'} className="preview-save">Save</button>}
                 {feedback !== 'idle' && <span className="save-feedback">{feedback === 'saving' ? 'Saving...' : feedback === 'saved' ? 'Saved!' : 'Error saving'}</span>}
                 {editing
                     ? <textarea value={content} onChange={(e) => setContent(e.target.value)} className="editor-textarea" />

@@ -214,6 +214,23 @@ tbody td {
   color: var(--toolbar-text);
 }
 
+.preview-save {
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-left: 8px;
+  margin-bottom: 12px;
+  border: 1px solid var(--table-border);
+  border-radius: 4px;
+  background: var(--toolbar-bg);
+  color: var(--toolbar-text);
+}
+
+.preview-save:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .save-feedback {
   margin-left: 10px;
   font-size: 13px;
