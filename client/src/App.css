@@ -88,6 +88,32 @@ body {
   border-color: var(--accent);
 }
 
+/* On a phone the toolbar's controls are wider than the viewport, and the
+   toolbar sits outside .container, so the overflow widens the whole page
+   instead of scrolling inside a pane. Let it wrap, drop the title onto its
+   own row (absolute centring would otherwise land it on top of the buttons),
+   and let the search input shrink -- min-width: 0 is what allows that, since
+   flex items default to min-width: auto and refuse to go below their
+   intrinsic size. */
+@media (max-width: 700px) {
+  .toolbar {
+    flex-wrap: wrap;
+  }
+
+  .toolbar h1 {
+    position: static;
+    transform: none;
+    order: -1;
+    flex-basis: 100%;
+    text-align: center;
+  }
+
+  .toolbar input {
+    flex: 1 1 120px;
+    min-width: 0;
+  }
+}
+
 /* --- Breadcrumb --- */
 
 nav {
