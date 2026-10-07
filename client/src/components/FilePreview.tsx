@@ -97,8 +97,8 @@ export function FilePreview({ entry, onClose }: Props) {
                 {editing
                     ? <textarea value={content} onChange={(e) => setContent(e.target.value)} className="editor-textarea" />
                     : isMD
-                        ? <div dangerouslySetInnerHTML={{ __html: md }}></div>
-                        : <pre><code dangerouslySetInnerHTML={{ __html: highlighted }}/></pre>
+                        ? <div className="markdown-preview" dangerouslySetInnerHTML={{ __html: md }}></div>
+                        : <pre className="code-preview"><code dangerouslySetInnerHTML={{ __html: highlighted }}/></pre>
                 }
                 {isDirty && <span className="dirty-indicator">Unsaved changes</span>}
             </div>
