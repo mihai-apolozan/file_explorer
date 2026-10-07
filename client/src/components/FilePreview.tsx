@@ -3,7 +3,7 @@ import { readFile, writeFile } from "../api/files";
 import { useEffect, useState, useMemo } from "react";
 import type { FileEntry } from "../types";
 import hljs from 'highlight.js';
-import 'highlight.js/styles/atom-one-light.css';
+import 'highlight.js/styles/atom-one-dark.css';
 import { marked } from "marked";
 
 interface Props {
